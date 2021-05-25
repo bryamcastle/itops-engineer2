@@ -1,0 +1,20 @@
+#! /bin/bash
+#
+sudo yum install ansible -y
+sudo yum install git -y
+git clone -b master  https://github.com/bryamcastle/itops-engineer.git
+ssh-keygen -f .ssh/id_rsa -N "" -y
+touch ~/.ssh/authorized_keys
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorized_keys
+echo $(hostname -i) >> /itops-engineer2/task2/hosts
+ansible-playbook -i /itops-engineer2/task2/hosts /itops-engineer2/task2/task2.yaml
+ip=$(hostname -i)
+echo "admin:${sudo cat /var/lib/jenkins/secrets/initialAdminPassword}" > secrets
+java -jar jenkins-cli.jar -s http://${ip}:8080/ -auth @secrets who-am-i
+java -jar jenkins-cli.jar -s http://${ip}:8080/ -auth @secrets install-plugin workflow-aggregator
+java -jar jenkins-cli.jar -s http://${ip}.100:8080/ -auth @secrets install-plugin pipeline-utility-steps
+java -jar jenkins-cli.jar -s http://${ip}:8080/ -auth @secrets install-plugin git
+java -jar jenkins-cli.jar -s http://${ip}:8080/ -auth @secrets install-plugin github-api
+java -jar jenkins-cli.jar -s http://${ip}:8080/ -auth @secrets safe-restart
+java -jar jenkins-cli.jar -s http://${ip}:8080/ -auth @secrets -webSocket create-job testjob < job.xml

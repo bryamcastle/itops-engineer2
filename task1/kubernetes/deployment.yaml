@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world-deployment
+spec:
+  selector:
+    matchLabels:
+      greeting: hello
+      department: world
+  replicas: 0
+  template:
+    metadata:
+      labels:
+        greeting: hello
+        department: world
+    spec:
+      containers:
+      - name: hello
+        image: "gcr.io/labhome-314502/hello-world-app"
+        env:
+        - name: "PORT"
+          value: "6666"
